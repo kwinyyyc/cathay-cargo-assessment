@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: agent-api
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:agent-postgres}:${DB_PORT:5432}/${DB_NAME:agentdb}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+agent:
+  security:
+    jwt-secret: ${AGENT_JWT_SECRET:agent-demo-secret-key-please-change}

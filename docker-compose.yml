@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: flight-postgres
+    environment:
+      POSTGRES_DB: flightdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/packages/flight-api/src/main/resources/db/migration/init-flights.sql:/docker-entrypoint-initdb.d/init-flights.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  flight-api:
+    build:
+      context: ./src/packages/flight-api
+      dockerfile: Dockerfile
+    container_name: flight-api
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: flightdb
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  corp-site:
+    build:
+      context: ./src/packages/corp-site
+      dockerfile: Dockerfile
+    container_name: corp-site
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - flight-api
+    restart: unless-stopped
+
+  agent-postgres:
+    image: postgres:16-alpine
+    container_name: agent-postgres
+    environment:
+      POSTGRES_DB: agentdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_agent_data:/var/lib/postgresql/data
+      - ./src/packages/agent-api/src/main/resources/db/migration/init-agents.sql:/docker-entrypoint-initdb.d/init-agents.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  agent-api:
+    build:
+      context: ./src/packages/agent-api
+      dockerfile: Dockerfile
+    container_name: agent-api
+    environment:
+      DB_HOST: agent-postgres
+      DB_PORT: 5432
+      DB_NAME: agentdb
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      SERVER_PORT: 8080
+      AGENT_JWT_SECRET: agent-demo-secret-key-please-change
+    ports:
+      - "8081:8080"
+    depends_on:
+      agent-postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  postgres_agent_data:
+

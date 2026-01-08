@@ -1,0 +1,37 @@
+# Maven
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
+
+# Node
+**/node_modules/
+**/.next/
+**/out/
+**/.pnp
+**/.pnp.js
+
+# IDE
+**/.idea/
+**/.vscode/
+**/*.iml
+**/.classpath
+**/.project
+**/.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+**/*.log
+**/logs/
+
+# Environment
+**/.env
+**/.env.local
+**/.env*.local
+
+# Docker
+**/docker-compose.override.yml
+

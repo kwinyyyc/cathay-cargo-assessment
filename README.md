@@ -47,7 +47,7 @@ This project consists of three main components:
    - Port: `8081`
    - Database: PostgreSQL (`agentdb`)
    - Features: Agent search with filters, pagination
-   - Authentication: JWT with Cognito integration
+   - Authentication: JWT with Cognito integration [Not implemented]
 
 3. **Corp Site** (`corp-site`)
    - Port: `3000`
